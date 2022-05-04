@@ -1,7 +1,7 @@
 # ProxyScrape-And-Check
 Multithreaded free proxy scraper and checker with configurable timeout, website, proxy list, number of threads, with a nice GUI.
 
-### Download :
+### Install :
 ```shell
 # clone the repo
 $ git clone https://github.com/DrankRock/ProxyScrape-And-Check.git
@@ -13,6 +13,10 @@ $ python -m pip install -r requirements.txt
 
 ### Usage :
 ```shell
-# run
 $ python ProxyScrape
 ```
+
+### Features
+* HTTP/HTTPS Proxies
+* Completely free
+* ~2800 proxies scraped
