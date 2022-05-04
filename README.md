@@ -1,6 +1,8 @@
 # ProxyScrape-And-Check
 Multithreaded free proxy scraper and checker with configurable timeout, website, proxy list, number of threads, with a nice GUI.
 
+![ProxyScrape](https://user-images.githubusercontent.com/32172257/166814443-52f1cbb2-4475-40b1-96c1-92eeda4bba67.png)
+
 ### Install
 ```shell
 # clone the repo
