@@ -28,3 +28,18 @@ $ python ProxyScrape
 Please note that the menu is currently not working. It isn't necessary for basic functionnalities, I will add themes, advanced parameters, and a help in the future.
 
 ### Websites scraped
+https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt  
+https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt  
+https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/https.txt  
+https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt  
+https://raw.githubusercontent.com/jetkai/proxy-list/main/online-proxies/txt/proxies-http%2Bhttps.txt  
+https://raw.githubusercontent.com/User-R3X/proxy-list/main/online/http%2Bs.txt  
+https://openproxy.space/list/http  
+https://free-proxy-list.net/  
+
+### Websites to add 
+https://spys.one/en/https-ssl-proxy/  
+https://proxylist.geonode.com/  
+https://api.proxyscrape.com/  
+
+For any suggestion, you can contact me on discord 
