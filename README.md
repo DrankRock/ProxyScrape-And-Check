@@ -10,7 +10,7 @@ $ git clone https://github.com/DrankRock/ProxyScrape-And-Check.git
 # change the working directory to ProxyScrape-And-Check
 $ cd ProxyScrape-And-Check/
 # download required packages
-$ python -m pip install -r requirements.txt
+$ python3 -m pip install -r requirements.txt
 ```
 
 ### Usage
