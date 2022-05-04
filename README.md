@@ -1,7 +1,7 @@
 # ProxyScrape-And-Check
-Search for proxies online on various sources (manually found and updated) in Python, checks them, and makes it possible to use them in a proxy rotation software.
+Multithreaded free proxy scraper and checker with configurable timeout, website, proxy list, number of threads, with a nice GUI.
 
-## Download :
+### Download :
 ```shell
 # clone the repo
 $ git clone https://github.com/DrankRock/ProxyScrape-And-Check.git
@@ -11,11 +11,8 @@ $ cd ProxyScrape-And-Check/
 $ python -m pip install -r requirements.txt
 ```
 
-## Usage :
+### Usage :
 ```shell
-# run the example :
-$ python example.py
+# run
+$ python ProxyScrape
 ```
-
-## A Practical Example :
-In the CMScrape Project, a slighty modified version of this is used, to search for proxies online, check them, find a given amount of working proxies and run CMScrape with auto-rotating proxies.

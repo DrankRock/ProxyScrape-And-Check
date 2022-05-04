@@ -1,0 +1,4 @@
+beautifulsoup4==4.11.1
+lxml==4.7.1
+PyQt5==5.15.6
+requests==2.18.4
