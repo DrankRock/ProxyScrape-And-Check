@@ -50,9 +50,12 @@ class Worker(QtCore.QRunnable):
 		'''
 		Your code goes in this function
 		'''
-		myProxyClass = proxyClass(self.nProxiesThreads, self.signals, self.website, self.timeout, self.getProxiesFromScraping, self.proxyList)
-		myProxyClass.checkProxies()
+		self.myProxyClass = proxyClass(self.nProxiesThreads, self.signals, self.website, self.timeout, self.getProxiesFromScraping, self.proxyList)
+		self.myProxyClass.checkProxies()
 		self.signals.progress.emit(-4)
+
+	def terminate(self):
+		self.myProxyClass.terminate()
 		
 			
 
@@ -72,9 +75,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 		self.outputFileBtn.clicked.connect(self.outputFileDialog)
 		self.toggleProxyScrape.clicked.connect(self.toggleScraping)
 		self.runButton.clicked.connect(self.run)
+		self.cancelButton.clicked.connect(self.cancel)
 
 		self.DEBUG = False
 
+	def cancel(self):
+		try:
+			self.worker.terminate()
+			self.statusWindow.setPlainText("Execution cancelled.")
+		except:
+			self.statusWindow.setPlainText("Error while cancelling. Has it started ?")
+			
+		self.unlockAll()
+		self.progressBar.setValue(0)
+		
 	def toggleScraping(self):
 		if self.proxycraping == True:
 			self.proxycraping = False
@@ -189,12 +203,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 		self.lockAll()
 		self.printRunDetail()
 		self.proxieList = self.proxyListWindow.toPlainText().split("\n")
-		worker = Worker(self.numberOfThreads.value(), self.websiteTxt.toPlainText(), self.timeout.value(), self.proxycraping, self.proxieList)
-		self.threadpool.start(worker)
-		worker.signals.progress.connect(self.update_progress)
-		worker.signals.console.connect(self.update_console)
-		worker.signals.end.connect(self.endQMessageBox)
-		worker.signals.proxies.connect(self.updateProxyList)
+		self.worker = Worker(self.numberOfThreads.value(), self.websiteTxt.toPlainText(), self.timeout.value(), self.proxycraping, self.proxieList)
+		self.threadpool.start(self.worker)
+		self.worker.signals.progress.connect(self.update_progress)
+		self.worker.signals.console.connect(self.update_console)
+		self.worker.signals.end.connect(self.endQMessageBox)
+		self.worker.signals.proxies.connect(self.updateProxyList)
 
 #=############################################################=#
 # ------------------------- GRAPHIC -------------------------- #

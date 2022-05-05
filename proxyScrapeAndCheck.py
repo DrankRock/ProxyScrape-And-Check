@@ -131,7 +131,7 @@ class proxyClass():
     def checkProxies(self):
         startTime = time.time()
         socket.setdefaulttimeout(TIMEOUT)
-        pool = ThreadPool(self.nProcess)
+        self.pool = ThreadPool(self.nProcess)
         #pool = multiprocessing.Pool(processes=self.nProcess)
         iterator = 0
         working = 0
@@ -139,7 +139,7 @@ class proxyClass():
         self.signals.console.emit("Setting up multithreading for proxies check ...")
         lenProxyList = len(self.proxyList)
         try:
-            vals = pool.imap(self.checkProxy, self.proxyList)
+            vals = self.pool.imap(self.checkProxy, self.proxyList)
             for result in vals:
                 text = "Checking Proxies : [{}/{}] - Working : {}".format((iterator+1),lenProxyList, working)
                 #self.progressBar.setValue(round(float(iterator+1)/lenProxyList*100))
@@ -157,6 +157,10 @@ class proxyClass():
         self.signals.progress.emit(-3)
         self.signals.proxies.emit(output)
         return output 
+
+    def terminate(self):
+        print("Terminating ProxyClass Threadpool")
+        self.pool.terminate()
 
 
 # This comes from : https://stackoverflow.com/a/765436
