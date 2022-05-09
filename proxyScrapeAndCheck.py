@@ -31,16 +31,16 @@ class proxyClass():
             self.initWebScrape()
         if givenProxyList != []:
             self.proxyList.extend(givenProxyList)
-        random.shuffle(self.proxyList)
+        # random.shuffle(self.proxyList)
         
     def consoleEmit(self, string, backToLine=True):
         if self.useGUI :
             self.signals.console.emit(string)
         else :
             if backToLine :
-                print("[{}] - {}.".format(time.ctime(), string))
+                print("[{}] - {}".format(time.ctime(), string))
             else :
-                print("\r[{}] - {}.".format(time.ctime(), string), end='')
+                print("\r[{}] - {}".format(time.ctime(), string), end='')
 
     def progressEmit(self, value):
         if self.useGUI :
@@ -53,6 +53,7 @@ class proxyClass():
             if mode == 1 :
                 print("[{}] - Scraped Proxies :".format(time.ctime()))
             if mode == 2 :
+                print("\n")
                 print("[{}] - Working Proxies :".format(time.ctime()))
             for elem in value :
                 print(elem)
@@ -166,7 +167,7 @@ class proxyClass():
         try:
             vals = self.pool.imap(self.checkProxy, self.proxyList)
             for result in vals:
-                text = "Checking Proxies : [{}/{}] - Working : {}".format((iterator+1),lenProxyList, working)
+                text = "Checking Proxies : [{}/{}] - Working : {}".format((iterator),lenProxyList, working)
                 #self.progressBar.setValue(round(float(iterator+1)/lenProxyList*100))
                 self.progressEmit(round(float(iterator+1)/lenProxyList*100))
 

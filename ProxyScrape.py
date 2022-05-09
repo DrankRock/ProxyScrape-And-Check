@@ -230,16 +230,20 @@ def terminal(args):
 	signal.signal(signal.SIGINT, executionInterrupted)
 	signal.signal(signal.SIGTERM, executionInterrupted)
 
-	myProxyClass = proxyClass(int(args.threads), args.website, int(args.timeout), bool(not args.noscrape), [], gui=False)
+	# If there are some inputs
+	if args.input != [] or args.input != None :
+		initialProxies = []
+		for files in args.input :
+			with open(files, 'r') as f :
+				lines = [line.rstrip() for line in f]
+				initialProxies.extend(lines)
+
+	myProxyClass = proxyClass(int(args.threads), args.website, int(args.timeout), bool(not args.noscrape), initialProxies, gui=False)
 
 	# not done args : input, logfile, output
-
 	if not args.nocheck :
+		printT("Cheking proxies")
 		myProxyClass.checkProxies()
-	else :
-		printT("Scraped Proxies : ")
-		for elem in myProxyClass.getProxies():
-			print(elem)
 
 def arguments():
 	ap = argparse.ArgumentParser()
