@@ -15,8 +15,39 @@ $ python3 -m pip install -r requirements.txt
 
 ### Usage
 ```shell
-$ python ProxyScrape
+$ python ProxyScrape.py
 ```
+
+#### Terminal/Console version
+```
+$ python ProxyScrape.py --help
+usage: ProxyScrape.py [-h] [-i INPUT [INPUT ...]] [-l [LOGFILE]] [-nc] [-ns]
+                      [-o [OUTPUT]] [-te] [-th [THREADS]] [-ti [TIMEOUT]]
+                      [-w [WEBSITE]]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT [INPUT ...], --input INPUT [INPUT ...]
+                        file containing http/https proxies to check (one or
+                        more arguments)
+  -l [LOGFILE], --logfile [LOGFILE]
+                        Set the output to a logfile (default = False)
+  -nc, --nocheck        De-Activate proxies checking
+  -ns, --noscrape       De-Activate proxies scraping
+  -o [OUTPUT], --output [OUTPUT]
+                        select an output file for working proxies
+  -te, --terminal       launch the terminal version
+  -th [THREADS], --threads [THREADS]
+                        number of threads (default = 50)
+  -ti [TIMEOUT], --timeout [TIMEOUT]
+                        timeout (default = 10)
+  -w [WEBSITE], --website [WEBSITE]
+                        website used for checking (default =
+                        'https://www.google.com)'
+
+$ python ProxyScrape.py -te -th 100 -ti 5
+```
+Please note that there is no `--gui` option, as by default, it will launch the gui version. 
 
 ### Features
 * HTTP/HTTPS Proxies
