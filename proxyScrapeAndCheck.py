@@ -17,7 +17,7 @@ FINISH = False
 # https://spys.one/en/https-ssl-proxy/
 # needs scraping
 class proxyClass():
-    def __init__(self, proxyPoolSize, website, timeout, scraping, inputScraping, gui=True, signals=None,):
+    def __init__(self, proxyPoolSize, website, timeout, scraping, givenProxyList, gui=True, signals=None,):
         self.nProcess = proxyPoolSize
         self.signals = signals
         self.useGUI = gui
@@ -25,13 +25,12 @@ class proxyClass():
         global TIMEOUT
         WEBPAGE = website
         TIMEOUT = int(timeout)
-
         self.currentText = ""
         self.proxyList = []
         if scraping == True:
             self.initWebScrape()
-        if inputScraping != []:
-            self.proxyList.extend(inputScraping)
+        if givenProxyList != []:
+            self.proxyList.extend(givenProxyList)
         random.shuffle(self.proxyList)
         
     def consoleEmit(self, string, backToLine=True):
@@ -119,7 +118,7 @@ class proxyClass():
         self.currentText = "Total proxies after removing doubles : {}\n".format(len(self.proxyList))
         self.consoleEmit(self.currentText)
         # Print all the scraped proxies (disactivated because looks messy)
-        # self.proxiesEmit(self.proxyList, 1)
+        self.proxiesEmit(self.proxyList, 1)
 
     def getProxies(self):
         return self.proxyList

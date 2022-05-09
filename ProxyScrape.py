@@ -50,7 +50,7 @@ class Worker(QtCore.QRunnable):
 		'''
 		Your code goes in this function
 		'''
-		self.myProxyClass = proxyClass(self.nProxiesThreads, self.website, self.timeout, self.getProxiesFromScraping, self.proxyList, self.signals)
+		self.myProxyClass = proxyClass(self.nProxiesThreads, self.website, self.timeout, self.getProxiesFromScraping, self.proxyList, signals=self.signals)
 		self.myProxyClass.checkProxies()
 		self.signals.progress.emit(-4)
 
@@ -105,12 +105,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 		options |= self.fileDialog.DontUseNativeDialog
 		#options |= self.fileDialog.setDefaultSuffix(self.fileDialog, "csv")
 		#filename, _ = self.fileDialog.getOpenFileName(self, 'Open File', '.')
-		fileName, _ = self.fileDialog.getOpenFileName(self,"Chose desired input file",self.inputFolderPath,"", options=options)
+		fileName, _ = self.fileDialog.getOpenFileName(self,"Chose desired input file",".","", options=options)
 		if fileName:
-			# print(fileName)
-			self.inputFileChosen = fileName
-			self.chosenFileLbl.setText(str(fileName))
-			self.chosenFileLbl.adjustSize()
+			with open(fileName, 'r') as f:
+				currentText = self.proxyListWindow.toPlainText().split("\n")
+				lines = [line.rstrip() for line in f]
+				currentText.extend(lines)
+				currentText = sorted(set(currentText))
+
+				self.proxyListWindow.setPlainText("\n".join(currentText))
 
 	def outputFileDialog(self):
 		self.fileDialog = QFileDialog()
