@@ -1,4 +1,4 @@
-import sys
+import sys, argparse, time, signal
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSignal
@@ -50,7 +50,7 @@ class Worker(QtCore.QRunnable):
 		'''
 		Your code goes in this function
 		'''
-		self.myProxyClass = proxyClass(self.nProxiesThreads, self.signals, self.website, self.timeout, self.getProxiesFromScraping, self.proxyList)
+		self.myProxyClass = proxyClass(self.nProxiesThreads, self.website, self.timeout, self.getProxiesFromScraping, self.proxyList, self.signals)
 		self.myProxyClass.checkProxies()
 		self.signals.progress.emit(-4)
 
@@ -213,6 +213,46 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 #=############################################################=#
 # ------------------------- GRAPHIC -------------------------- #
 
+# Print with the [ctime] - {str}
+def printT(string):
+	print("[{}] - {}.".format(time.ctime(), string))
+
+def terminal(args):
+	def executionInterrupted(sig, frame):
+		printT("Interrupting execution ...")
+		myProxyClass.terminate()
+		sys.exit(0)
+
+	printT("Starting terminal version of ProxyScrape.")
+	signal.signal(signal.SIGINT, executionInterrupted)
+	signal.signal(signal.SIGTERM, executionInterrupted)
+
+	myProxyClass = proxyClass(int(args.threads), args.website, int(args.timeout), bool(not args.noscrape), [], gui=False)
+
+	# not done args : input, logfile, output
+
+	if not args.nocheck :
+		myProxyClass.checkProxies()
+	else :
+		printT("Scraped Proxies : ")
+		for elem in myProxyClass.getProxies():
+			print(elem)
+
+def arguments():
+	ap = argparse.ArgumentParser()
+	ap.add_argument("-nc", "--nocheck", required=False, action="store_true", help="De-Activate proxies checking")
+	ap.add_argument("-i", "--input", required=False, nargs='+', type=str, help="file containing http/https proxies to check (one or more arguments)")
+	ap.add_argument("-l", "--logfile", required=False, default=False, nargs='?', type=bool, help="Set the output to a logfile (default = False)")
+	ap.add_argument("-ns", "--noscrape", required=False, action="store_true", help="Find proxies through scraping (default = True)")
+	ap.add_argument("-te", "--terminal", required=False, action="store_true", help="launch the terminal version (default = False) (/!\\ -g and -t can't be both True)")
+	ap.add_argument("-th", "--threads", required=False, default=50, nargs='?', type=int, help="number of threads (default = 50)")
+	ap.add_argument("-ti", "--timeout", required=False, default=10, nargs='?', type=int, help="timeout (default = 10)")
+	ap.add_argument("-w", "--website", required=False, default="https://www.google.com", nargs='?', type=str, help="website used for checking (default = www.google.com)")
+	ap.add_argument("-o", "--output", required=False, nargs='?', type=str, help="select an output file for working proxies")
+
+	args = ap.parse_args()
+	return args
+
 def graphic():
 	app = QtWidgets.QApplication(sys.argv)
 	main = MainWindow()
@@ -220,4 +260,12 @@ def graphic():
 	sys.exit(app.exec_())
 
 if __name__ == "__main__":
-    graphic()
+	args = arguments()
+	if args.terminal :
+		# print("Open the damn terminal version!")
+		# print("input file(s) : {}".format(args.input))
+		terminal(args)
+	else :
+		print("Graphical Version")
+		graphic()
+    # graphic()

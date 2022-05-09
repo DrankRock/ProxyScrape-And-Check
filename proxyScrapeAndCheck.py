@@ -17,13 +17,14 @@ FINISH = False
 # https://spys.one/en/https-ssl-proxy/
 # needs scraping
 class proxyClass():
-    def __init__(self, proxyPoolSize, signals, website, timeout, scraping, inputScraping):
+    def __init__(self, proxyPoolSize, website, timeout, scraping, inputScraping, gui=True, signals=None,):
         self.nProcess = proxyPoolSize
         self.signals = signals
+        self.useGUI = gui
         global WEBPAGE
         global TIMEOUT
         WEBPAGE = website
-        TIMEOUT = timeout
+        TIMEOUT = int(timeout)
 
         self.currentText = ""
         self.proxyList = []
@@ -33,6 +34,29 @@ class proxyClass():
             self.proxyList.extend(inputScraping)
         random.shuffle(self.proxyList)
         
+    def consoleEmit(self, string, backToLine=True):
+        if self.useGUI :
+            self.signals.console.emit(string)
+        else :
+            if backToLine :
+                print("[{}] - {}.".format(time.ctime(), string))
+            else :
+                print("\r[{}] - {}.".format(time.ctime(), string), end='')
+
+    def progressEmit(self, value):
+        if self.useGUI :
+            self.signals.progress.emit(value)
+
+    def proxiesEmit(self, value, mode):
+        if self.useGUI :
+            self.signals.proxies.emit(value)
+        else :
+            if mode == 1 :
+                print("[{}] - Scraped Proxies :".format(time.ctime()))
+            if mode == 2 :
+                print("[{}] - Working Proxies :".format(time.ctime()))
+            for elem in value :
+                print(elem)
 
     def initWebScrape(self):
         # I'm keeping this overly complicated version in case of needing to know if it's http or https
@@ -55,7 +79,7 @@ class proxyClass():
                     self.proxyList.append(temp)
                 current += 1
             self.currentText = "found {} proxies at https://free-proxy-list.net/".format(len(self.proxyList))
-            self.signals.console.emit(self.currentText)
+            self.consoleEmit(self.currentText)
 
         def openProxySpace():
             page = requests.get("https://openproxy.space/list/http")
@@ -71,7 +95,7 @@ class proxyClass():
                     self.proxyList.append(prox)
                     tot = tot + 1
             self.currentText = self.currentText+"\nfound {} proxies at https://openproxy.space/list/http".format(tot)
-            self.signals.console.emit(self.currentText)
+            self.consoleEmit(self.currentText)
 
         freeProxyListNet()
         openProxySpace()
@@ -89,12 +113,13 @@ class proxyClass():
             out = r.content.decode("utf8").splitlines()
             self.proxyList = self.proxyList+out
             self.currentText = "found {} proxies at {}".format(len(out),link)
-            self.signals.console.emit(self.currentText)
+            self.consoleEmit(self.currentText)
         self.currentText = "found {} proxies in total".format(len(self.proxyList))
         self.proxyList = sorted(set(self.proxyList))
         self.currentText = "Total proxies after removing doubles : {}\n".format(len(self.proxyList))
-        self.signals.console.emit(self.currentText)
-        self.signals.proxies.emit(self.proxyList)
+        self.consoleEmit(self.currentText)
+        # Print all the scraped proxies (disactivated because looks messy)
+        # self.proxiesEmit(self.proxyList, 1)
 
     def getProxies(self):
         return self.proxyList
@@ -123,8 +148,9 @@ class proxyClass():
                 urllib.request.install_opener(opener)
                 req=urllib.request.Request(WEBPAGE)  # change the URL to test here
                 sock=urllib.request.urlopen(req)
-            except:
-                #print("ERROR:", detail)
+                
+            except Exception as detail:
+                # print("ERROR:", detail)
                 return -1
             return pip
 
@@ -136,15 +162,16 @@ class proxyClass():
         iterator = 0
         working = 0
         output = []
-        self.signals.console.emit("Setting up multithreading for proxies check ...")
+        self.consoleEmit("Setting up multithreading for proxies check ...")
         lenProxyList = len(self.proxyList)
         try:
             vals = self.pool.imap(self.checkProxy, self.proxyList)
             for result in vals:
                 text = "Checking Proxies : [{}/{}] - Working : {}".format((iterator+1),lenProxyList, working)
                 #self.progressBar.setValue(round(float(iterator+1)/lenProxyList*100))
-                self.signals.progress.emit(round(float(iterator+1)/lenProxyList*100))
-                self.signals.console.emit(text)
+                self.progressEmit(round(float(iterator+1)/lenProxyList*100))
+
+                self.consoleEmit(text, backToLine=False)
                 #print(text, end="\r", flush=True)
                 if result != -1:
                     output.append(result)
@@ -154,45 +181,10 @@ class proxyClass():
         except:
             global FINISH
             FINISH = True
-        self.signals.progress.emit(-3)
-        self.signals.proxies.emit(output)
+        self.progressEmit(-3)
+        self.proxiesEmit(output, 2)
         return output 
 
     def terminate(self):
-        print("Terminating ProxyClass Threadpool")
+        self.consoleEmit("Terminating ProxyClass Threadpool")
         self.pool.terminate()
-
-
-# This comes from : https://stackoverflow.com/a/765436
-
-'''
-# Enhanced version of what's from stackoverflow with multiprocessing
-def main(nProcess, timeout):
-    socket.setdefaulttimeout(int(timeout))
-    if len(sys.argv) > 1:
-        p = proxyClass(sys.argv[1])
-    else:
-        p = proxyClass(False)
-    if len(sys.argv) > 2:
-        typeP = sys.argv[2]
-        p.TheType(typeP)
-    
-    proxyList = p.getProxies()
-    pool = ThreadPool(nProcess)
-    vals = pool.imap(is_bad_proxy, proxyList)
-    iterator = 0
-    working = 0
-    output = []
-    print("Checking which proxies are working ... (might take some time)\nThreads = {}\nTimeout = {}\nTesting url = {}".format(THREADS,TIMEOUT,WEBPAGE))
-    for result in vals:
-        print("[{}/{}] - Working : {}".format((iterator+1),len(proxyList), working), end="\r", flush=True)
-        if result != -1:
-            output.append(result)
-            working+=1
-        iterator+=1
-    strOut = "\n".join(output)
-    #print("Working Proxies : \n{}".format(strOut))
-    return strOut
-
-# Search for free proxies and check which one are working, on google, with a timeout of 5s, on 8 threads
-'''
