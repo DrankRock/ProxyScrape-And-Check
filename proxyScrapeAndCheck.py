@@ -33,6 +33,11 @@ class proxyClass():
             self.initWebScrape()
         if givenProxyList != []:
             self.proxyList.extend(givenProxyList)
+        # Delete content of output :
+        if output != "":
+            with open(output, 'w') as f:
+                print("", file=f)
+
         # random.shuffle(self.proxyList)
         
     def consoleEmit(self, string, backToLine=True):
@@ -113,7 +118,11 @@ class proxyClass():
 
         httpLinks = [
             "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt",
-
+            "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt",
+            "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/https.txt",
+            "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
+            "https://raw.githubusercontent.com/jetkai/proxy-list/main/online-proxies/txt/proxies-http%2Bhttps.txt",
+            "https://raw.githubusercontent.com/User-R3X/proxy-list/main/online/http%2Bs.txt",
         ]
         for link in httpLinks:
             r = requests.get(link, allow_redirects=True)

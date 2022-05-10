@@ -35,7 +35,7 @@ class Worker(QtCore.QRunnable):
 	'''
 	Worker thread
 	'''
-	def __init__(self, nProxiesThreads, website, timeout, getProxiesFromScraping, proxyList):
+	def __init__(self, nProxiesThreads, website, timeout, getProxiesFromScraping, proxyList, outputFile):
 		super(Worker, self).__init__()
 
 		self.nProxiesThreads = nProxiesThreads
@@ -43,6 +43,7 @@ class Worker(QtCore.QRunnable):
 		self.timeout = timeout
 		self.getProxiesFromScraping = getProxiesFromScraping
 		self.proxyList = proxyList
+		self.outputFile = outputFile
 
 		self.signals = WorkerSignals()
 
@@ -50,7 +51,7 @@ class Worker(QtCore.QRunnable):
 		'''
 		Your code goes in this function
 		'''
-		self.myProxyClass = proxyClass(self.nProxiesThreads, self.website, self.timeout, self.getProxiesFromScraping, self.proxyList, signals=self.signals)
+		self.myProxyClass = proxyClass(self.nProxiesThreads, self.website, self.timeout, self.getProxiesFromScraping, self.proxyList, signals=self.signals, output=self.outputFile)
 		self.myProxyClass.checkProxies()
 		self.signals.progress.emit(-4)
 
@@ -68,6 +69,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 		self.nProxy = 0
 		self.nProxiesThreads = 0
 		self.outputFolderPath = ''
+		self.outputFile = ""
 		self.proxycraping = True
 		self.threadpool = QtCore.QThreadPool()
 
@@ -124,9 +126,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 		fileName, _ = self.fileDialog.getSaveFileName(self,"Chose or create desired output file",self.outputFolderPath,"", options=options)
 		if fileName:
 			# print(fileName)
-			self.outputFileChosen = fileName
-			self.chosenOutLbl.setText(str(fileName))
-			self.chosenOutLbl.adjustSize()
+			self.outputFile = fileName
 
 	def update_progress(self,n):
 		if n == -1:
@@ -206,7 +206,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 		self.lockAll()
 		self.printRunDetail()
 		self.proxieList = self.proxyListWindow.toPlainText().split("\n")
-		self.worker = Worker(self.numberOfThreads.value(), self.websiteTxt.toPlainText(), self.timeout.value(), self.proxycraping, self.proxieList)
+		self.worker = Worker(self.numberOfThreads.value(), self.websiteTxt.toPlainText(), self.timeout.value(), self.proxycraping, self.proxieList, self.outputFile)
 		self.threadpool.start(self.worker)
 		self.worker.signals.progress.connect(self.update_progress)
 		self.worker.signals.console.connect(self.update_console)
