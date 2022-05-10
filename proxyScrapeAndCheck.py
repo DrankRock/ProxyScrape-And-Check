@@ -17,10 +17,12 @@ FINISH = False
 # https://spys.one/en/https-ssl-proxy/
 # needs scraping
 class proxyClass():
-    def __init__(self, proxyPoolSize, website, timeout, scraping, givenProxyList, gui=True, signals=None,):
+    def __init__(self, proxyPoolSize, website, timeout, scraping, givenProxyList, gui=True, signals=None, output=""):
         self.nProcess = proxyPoolSize
         self.signals = signals
         self.useGUI = gui
+        self.printOutput = output
+
         global WEBPAGE
         global TIMEOUT
         WEBPAGE = website
@@ -52,11 +54,20 @@ class proxyClass():
         else :
             if mode == 1 :
                 print("[{}] - Scraped Proxies :".format(time.ctime()))
+                for elem in value :
+                    print(elem)
             if mode == 2 :
                 print("\n")
-                print("[{}] - Working Proxies :".format(time.ctime()))
-            for elem in value :
-                print(elem)
+                if self.printOutput != "" :
+                    f = open(self.printOutput, 'a')
+                    print("[{}] - Working Proxies printed in {}".format(time.ctime(), self.printOutput))
+                else :
+                    f = sys.stdout
+                    print("[{}] - Working Proxies :".format(time.ctime()))
+                with open(self.printOutput, 'a') as f :
+                    for elem in value :
+                        print(elem, file=f)
+
 
     def initWebScrape(self):
         # I'm keeping this overly complicated version in case of needing to know if it's http or https
@@ -94,7 +105,7 @@ class proxyClass():
                 for prox in proxies:
                     self.proxyList.append(prox)
                     tot = tot + 1
-            self.currentText = self.currentText+"\nfound {} proxies at https://openproxy.space/list/http".format(tot)
+            self.currentText = "found {} proxies at https://openproxy.space/list/http".format(tot)
             self.consoleEmit(self.currentText)
 
         freeProxyListNet()
@@ -102,11 +113,7 @@ class proxyClass():
 
         httpLinks = [
             "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt",
-            "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt",
-            "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/https.txt",
-            "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
-            "https://raw.githubusercontent.com/jetkai/proxy-list/main/online-proxies/txt/proxies-http%2Bhttps.txt",
-            "https://raw.githubusercontent.com/User-R3X/proxy-list/main/online/http%2Bs.txt",
+
         ]
         for link in httpLinks:
             r = requests.get(link, allow_redirects=True)
