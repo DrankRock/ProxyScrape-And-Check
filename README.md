@@ -3,6 +3,9 @@ Multithreaded free proxy scraper and checker with configurable timeout, website,
 
 ![ProxyScrape](https://user-images.githubusercontent.com/32172257/166814443-52f1cbb2-4475-40b1-96c1-92eeda4bba67.png)
 
+### Important Notes
+Free proxies are very unstable, so maybe that the working proxies won't work if tested immediately after. This software will work with any type of proxies for the checking, but will not give you great proxies in scraping mode, as they will be from free sources.
+
 ### Install
 ```shell
 # clone the repo
