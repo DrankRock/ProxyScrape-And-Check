@@ -48,9 +48,6 @@ class Worker(QtCore.QRunnable):
 		self.signals = WorkerSignals()
 
 	def run(self):
-		'''
-		Your code goes in this function
-		'''
 		self.myProxyClass = proxyClass(self.nProxiesThreads, self.website, self.timeout, self.getProxiesFromScraping, self.proxyList, signals=self.signals, output=self.outputFile)
 		self.myProxyClass.checkProxies()
 		self.signals.progress.emit(-4)
@@ -61,9 +58,12 @@ class Worker(QtCore.QRunnable):
 			
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-	def __init__(self, parent=None):
+	def __init__(self, arguments, parent=None):
 		QtWidgets.QMainWindow.__init__(self, parent)
 		self.setupUi(self)
+
+		self.consoleArguments = arguments
+		# self.readArguments()
 
 		self.nThreads = 0
 		self.nProxy = 0
@@ -80,6 +80,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 		self.cancelButton.clicked.connect(self.cancel)
 
 		self.DEBUG = False
+
+	def readArguments(self):
+		'''
+		ap.add_argument("-i", "--input", required=False, nargs='+', type=str, help="file containing http/https proxies to check (one or more arguments)")
+		ap.add_argument("-l", "--logfile", required=False, default=False, nargs='?', type=bool, help="Set the output to a logfile (default = False)")
+		ap.add_argument("-nc", "--nocheck", required=False, action="store_true", help="De-Activate proxies checking")
+		ap.add_argument("-ns", "--noscrape", required=False, action="store_true", help="De-Activate proxies scraping")
+		ap.add_argument("-o", "--output", required=False, nargs='?', type=str, help="select an output file for working proxies")
+		ap.add_argument("-te", "--terminal", required=False, action="store_true", help="launch the terminal version")
+		ap.add_argument("-th", "--threads", required=False, default=50, nargs='?', type=int, help="number of threads (default = 50)")
+		ap.add_argument("-ti", "--timeout", required=False, default=10, nargs='?', type=int, help="timeout (default = 10)")
+		ap.add_argument("-w", "--website", required=False, default="https://www.google.com", nargs='?', type=str, help="website used for checking (default = 'https://www.google.com)'")
+
+		'''
+		self.ConsolenThreads = self.consoleArguments.threads
+		self.ConsoletimeoutValue = self.consoleArguments.timeout
+		self.Consolewebsite = self.consoleArguments.website
+		self.Consoleinputs=self.consoleArguments.input
+		self.ConsoleLogfile = consoleArguments.logfile
+		self.ConsoleNoCheck = consoleArguments.nocheck
+		if self.consoleArguments.noscrape :
+			self.ConsoleNoScrape = True
 
 	def cancel(self):
 		try:
@@ -263,9 +285,9 @@ def arguments():
 	args = ap.parse_args()
 	return args
 
-def graphic():
+def graphic(args):
 	app = QtWidgets.QApplication(sys.argv)
-	main = MainWindow()
+	main = MainWindow(args)
 	main.show()
 	sys.exit(app.exec_())
 
@@ -277,5 +299,5 @@ if __name__ == "__main__":
 		terminal(args)
 	else :
 		print("Graphical Version")
-		graphic()
+		graphic(args)
     # graphic()
